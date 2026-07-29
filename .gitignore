@@ -1,0 +1,3 @@
+incidents/inc-*.json
+__pycache__/
+*.pyc
