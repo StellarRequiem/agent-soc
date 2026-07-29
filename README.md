@@ -35,3 +35,8 @@ python3 ~/agent-soc/cli.py incidents
 ## Architecture
 
 See `ARCHITECTURE.md` · Plan `~/ops/CUA_AND_AGENT_SOC_PLAN.md`
+
+
+## License
+
+Apache-2.0
