@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from collect import collect  # noqa: E402
 from detect import detect  # noqa: E402
 from respond import clear_freeze, list_incidents, respond  # noqa: E402
+from watch import watch_loop, watch_once  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -28,6 +29,16 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--freeze", action="store_true", default=True)
     r.add_argument("--no-freeze", action="store_true")
     r.add_argument("--no-disarm", action="store_true")
+    w = sub.add_parser("watch", help="continuous collect/detect (JSONL ticks)")
+    w.add_argument("--interval", type=float, default=30.0, help="seconds between ticks")
+    w.add_argument("--once", action="store_true", help="single tick then exit")
+    w.add_argument(
+        "--auto-respond-high",
+        action="store_true",
+        help="on high/critical: FREEZE (disarm only if AGENT_SOC_AUTO_DISARM=1)",
+    )
+    w.add_argument("--max-ticks", type=int, default=None, help="stop after N ticks")
+    w.add_argument("--reason", default="agent-soc watch")
     sub.add_parser("incidents")
     sub.add_parser("clear-freeze", help="remove FREEZE files (operator recovery)")
     sub.add_parser("claim", help="print claim ceiling")
@@ -95,6 +106,22 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(json.dumps(out, indent=2)[:20000])
         return 0
+
+    if args.cmd == "watch":
+        if args.once:
+            out = watch_once(
+                auto_respond_high=args.auto_respond_high,
+                reason=args.reason,
+            )
+            # already printed by watch_once log; also pretty
+            print(json.dumps(out, indent=2)[:12000])
+            return 0
+        return watch_loop(
+            interval_sec=args.interval,
+            auto_respond_high=args.auto_respond_high,
+            max_ticks=args.max_ticks,
+            reason=args.reason,
+        )
 
     if args.cmd == "incidents":
         print(json.dumps(list_incidents(), indent=2)[:20000])
