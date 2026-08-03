@@ -30,18 +30,23 @@ def test_shell_bypass_at_2():
 
 
 def test_tool_spray_at_8():
-    ev = [{"code": "UNKNOWN_TOOL", "detail": f"tool t{i}"} for i in range(8)]
+    ev = [{"code": "UNKNOWN_TOOL", "detail": f"tool t{i}"} for i in range(5)]
     rules = {a["rule"] for a in abhorrent_alerts(ev)}
     assert "ABHORRENT_TOOL_SPRAY" in rules
 
 
+def test_path_smell_at_1():
+    ev = [{"detail": "read ../../../etc/passwd"}]
+    assert any(a["rule"] == "ABHORRENT_PATH_SMELL" for a in abhorrent_alerts(ev))
+
+
 def test_quiet_fixture_no_abhorrent():
-    # Same shape as test_quiet_below_every_threshold — no abhorrent rules
+    # Align with H2 quiet floor — no abhorrent and no base alerts
     ev = (
-        [{"code": "APP_DENIED", "kind": "event"} for _ in range(12)]
-        + [{"code": "CONFIRM_REQUIRED", "kind": "confirm"} for _ in range(4)]
+        [{"code": "APP_DENIED", "kind": "event"} for _ in range(9)]
+        + [{"code": "CONFIRM_REQUIRED", "kind": "confirm"} for _ in range(3)]
         + [{"code": "UNKNOWN_TOOL"} for _ in range(2)]
-        + [{"detail": "quit TextEdit"} for _ in range(2)]
+        + [{"detail": "quit TextEdit"} for _ in range(1)]
     )
     abh = abhorrent_alerts(ev)
     assert abh == []

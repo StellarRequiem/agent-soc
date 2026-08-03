@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "id": "abhorrent_shapes",
+    "description": "Purple fixtures for Phase C abhorrent detectors (offline event shapes)",
+    "version": 1
+  },
+  "cases": [
+    {
+      "id": "secret_shape",
+      "expect_rules": ["ABHORRENT_SECRET_SHAPE"],
+      "expect_min_severity": "critical",
+      "events": [
+        {
+          "kind": "deny",
+          "code": "ARG_POLICY",
+          "detail": "forbidden arg api_key present",
+          "tool": "shell.run"
+        }
+      ]
+    },
+    {
+      "id": "shell_bypass",
+      "expect_rules": ["ABHORRENT_SHELL_BYPASS"],
+      "expect_min_severity": "high",
+      "events": [
+        {"code": "UNKNOWN_TOOL", "detail": "shell_exec not in pack"},
+        {"code": "CUA_BLOCKED", "detail": "ambient shell_exec not in CUA"}
+      ]
+    },
+    {
+      "id": "tool_spray",
+      "expect_rules": ["ABHORRENT_TOOL_SPRAY"],
+      "expect_min_severity": "critical",
+      "events": [
+        {"code": "UNKNOWN_TOOL", "detail": "tool a"},
+        {"code": "UNKNOWN_TOOL", "detail": "tool b"},
+        {"code": "UNKNOWN_TOOL", "detail": "tool c"},
+        {"code": "UNKNOWN_TOOL", "detail": "tool d"},
+        {"code": "UNKNOWN_TOOL", "detail": "tool e"}
+      ]
+    },
+    {
+      "id": "path_smell",
+      "expect_rules": ["ABHORRENT_PATH_SMELL"],
+      "expect_min_severity": "high",
+      "events": [{"detail": "open ../../../etc/passwd", "tool": "shell.read_file"}]
+    },
+    {
+      "id": "quiet_floor",
+      "expect_rules": [],
+      "expect_min_severity": "info",
+      "events": [
+        {"code": "APP_DENIED", "kind": "event"},
+        {"code": "APP_DENIED", "kind": "event"},
+        {"code": "CONFIRM_REQUIRED", "kind": "confirm"},
+        {"code": "UNKNOWN_TOOL", "detail": "x"}
+      ]
+    }
+  ]
+}

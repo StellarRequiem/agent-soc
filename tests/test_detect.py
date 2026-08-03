@@ -37,45 +37,46 @@ def test_quiet_on_empty():
 
 
 def test_quiet_below_every_threshold():
-    # All rules just under the line. NOTE: UNKNOWN_TOOL is deny-class too, so it
-    # counts toward BOTH deny_n and unk — 12 APP_DENIED + 2 UNKNOWN_TOOL = 14
-    # deny-class events, one under the DENY_SPIKE threshold of 15.
+    # All rules just under the line (H2 thresholds):
+    # DENY_SPIKE>=12, HIGH_BLAST>=4, UNKNOWN>=3, RISKY>=2.
+    # 10 APP_DENIED + 2 UNKNOWN = 12 deny-class would fire DENY — stay at 11.
+    # CONFIRM=3 (<4), UNKNOWN=2 (<3), risky quit=1 (<2).
     ev = (
-        _events("APP_DENIED", n=12)
-        + _events("CONFIRM_REQUIRED", n=4, kind="confirm")
+        _events("APP_DENIED", n=9)
+        + _events("CONFIRM_REQUIRED", n=3, kind="confirm")
         + _events("UNKNOWN_TOOL", n=2)
-        + _events(n=2, detail="quit TextEdit")
+        + _events(n=1, detail="quit TextEdit")
     )
     out = detect(ev)
-    assert out["severity"] == "info"
+    assert out["severity"] == "info", out["alerts"]
     assert out["alert_count"] == 0
 
 
-# ---- DENY_SPIKE (medium, >= 15 in last 200) -------------------------------
+# ---- DENY_SPIKE (medium, >= 12 in last 200) -------------------------------
 
 def test_deny_spike_fires_at_15():
-    out = detect(_events("APP_DENIED", n=15))
+    out = detect(_events("APP_DENIED", n=12))
     rules = {a["rule"] for a in out["alerts"]}
     assert "DENY_SPIKE" in rules
     assert out["severity"] == "medium"
 
 
 def test_deny_spike_quiet_at_14():
-    out = detect(_events("NOT_ARMED", n=14))
+    out = detect(_events("NOT_ARMED", n=11))
     assert "DENY_SPIKE" not in {a["rule"] for a in out["alerts"]}
 
 
-# ---- HIGH_BLAST_CHURN (high, >= 5 confirm in last 100) --------------------
+# ---- HIGH_BLAST_CHURN (high, >= 4 confirm in last 100) --------------------
 
 def test_high_blast_churn_fires_at_5():
-    out = detect(_events("CONFIRM_REQUIRED", n=5, kind="confirm_required"))
+    out = detect(_events("CONFIRM_REQUIRED", n=4, kind="confirm_required"))
     rules = {a["rule"] for a in out["alerts"]}
     assert "HIGH_BLAST_CHURN" in rules
     assert out["severity"] == "high"
 
 
 def test_high_blast_churn_quiet_at_4():
-    out = detect(_events("CONFIRM_REQUIRED", n=4, kind="confirm_required"))
+    out = detect(_events("CONFIRM_REQUIRED", n=3, kind="confirm_required"))
     assert "HIGH_BLAST_CHURN" not in {a["rule"] for a in out["alerts"]}
 
 
@@ -88,10 +89,10 @@ def test_unknown_tool_fires_at_3():
     assert out["severity"] == "high"
 
 
-# ---- RISKY_ACTION_SHAPE (medium, >= 3 quit/post/shell in last 100) --------
+# ---- RISKY_ACTION_SHAPE (medium, >= 2 quit/post/shell in last 100) --------
 
 def test_risky_action_shape_fires_at_3():
-    out = detect(_events(n=3, detail="x.post to timeline"))
+    out = detect(_events(n=2, detail="x.post to timeline"))
     assert "RISKY_ACTION_SHAPE" in {a["rule"] for a in out["alerts"]}
 
 
@@ -143,10 +144,22 @@ def _install_recording_watch(monkeypatch, tmp_path, events: list[dict[str, Any]]
 
 
 def test_watch_auto_freezes_on_high(tmp_path, monkeypatch):
+    # H3: generic UNKNOWN_TOOL (high) without abhorrent class must NOT auto-freeze
     calls = _install_recording_watch(monkeypatch, tmp_path, _events("UNKNOWN_TOOL", n=3))  # high
     out = watch_mod.watch_once(auto_respond_high=True, reason="proof")
     assert out["severity"] == "high"
-    assert len(calls) == 1  # responded exactly once
+    assert calls == []
+    assert out.get("respond_skipped") == "high_without_abhorrent_class"
+
+
+def test_watch_auto_freezes_on_abhorrent(tmp_path, monkeypatch):
+    # Abhorrent secret shape → should engage
+    ev = [{"kind": "deny", "code": "ARG_POLICY", "detail": "api_key=sk-test", "tool": "x"}]
+    calls = _install_recording_watch(monkeypatch, tmp_path, ev)
+    out = watch_mod.watch_once(auto_respond_high=True, reason="proof")
+    assert out["severity"] == "critical"
+    assert len(calls) == 1
+    assert out.get("respond_filter") == "abhorrent_only"
 
 
 def test_watch_does_not_freeze_when_quiet(tmp_path, monkeypatch):

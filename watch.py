@@ -30,6 +30,19 @@ def _log(event: dict[str, Any]) -> None:
     print(json.dumps(event), flush=True)
 
 
+def _abhorrent_alerts(alerts: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    """H3: only class=abhorrent (or ABHORRENT_* rules) auto-engage."""
+    out = []
+    for a in alerts or []:
+        if a.get("class") == "abhorrent":
+            out.append(a)
+            continue
+        rule = str(a.get("rule") or "")
+        if rule.startswith("ABHORRENT_"):
+            out.append(a)
+    return out
+
+
 def watch_once(
     *,
     auto_respond_high: bool = False,
@@ -38,26 +51,34 @@ def watch_once(
     c = collect()
     d = detect(c.get("events") or [])
     sev = d.get("severity") or "info"
+    alerts = d.get("alerts") or []
+    abh = _abhorrent_alerts(alerts)
+    lock = d.get("lockdown") or {}
     out: dict[str, Any] = {
         "ok": True,
         "kind": "watch_tick",
         "events": c.get("count"),
         "severity": sev,
         "alert_count": d.get("alert_count"),
-        "alerts": d.get("alerts"),
+        "alerts": alerts,
+        "abhorrent_alert_count": len(abh),
+        "lockdown": lock,
     }
-    if auto_respond_high and sev in ("high", "critical"):
-        # Default: freeze only; disarm only if env AGENT_SOC_AUTO_DISARM=1
+    # H3: auto-respond only on abhorrent class (not every high like generic HIGH_BLAST_CHURN)
+    if auto_respond_high and abh and lock.get("should_engage_lockdown"):
         import os
 
         disarm = os.environ.get("AGENT_SOC_AUTO_DISARM", "0") in ("1", "true", "yes")
         r = respond(
-            reason=f"{reason}: severity={sev}",
+            reason=f"{reason}: abhorrent severity={sev} rules={[a.get('rule') for a in abh]}",
             freeze=True,
             disarm=disarm,
-            alerts=d.get("alerts"),
+            alerts=abh,
         )
         out["responded"] = r
+        out["respond_filter"] = "abhorrent_only"
+    elif auto_respond_high and sev in ("high", "critical") and not abh:
+        out["respond_skipped"] = "high_without_abhorrent_class"
     _log(out)
     return out
 

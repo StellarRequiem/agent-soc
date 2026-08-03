@@ -82,7 +82,7 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     # --- path / template smells ---
     path_n = sum(1 for e in window[-100:] if _PATH_SMELL_RE.search(_blob(e)))
     tmpl_n = sum(1 for e in window[-100:] if _TEMPLATE_SMELL_RE.search(_blob(e)))
-    if path_n >= 2:
+    if path_n >= 1:
         alerts.append(
             {
                 "severity": "high",
@@ -92,7 +92,7 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "class": "abhorrent",
             }
         )
-    if tmpl_n >= 2:
+    if tmpl_n >= 1:
         alerts.append(
             {
                 "severity": "high",
@@ -118,7 +118,7 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if e.get("code") == "HUMAN_CONFIRM_REQUIRED"
         and any(x in _blob(e).lower() for x in ("x_post", "x.post", "operator_confirm", "quit", "return"))
     )
-    if invent_confirm >= 6:
+    if invent_confirm >= 4:
         alerts.append(
             {
                 "severity": "high",
@@ -135,7 +135,7 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for e in window[-200:]
         if e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN_TOOL" in str(e.get("code") or "")
     )
-    if unk >= 8:
+    if unk >= 5:
         alerts.append(
             {
                 "severity": "critical",

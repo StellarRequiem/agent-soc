@@ -18,7 +18,8 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
     deny_n = sum(1 for e in events[-200:] if "deny" in str(e.get("kind")).lower() or e.get("code") in (
         "NOT_ARMED", "APP_DENIED", "UNKNOWN_TOOL", "VELOCITY", "HUMAN_CONFIRM_REQUIRED", "D4_SESSION_CLOSED",
     ))
-    if deny_n >= 15:
+    # H2: slightly tighter deny spike (12 was quiet floor; tests use 11 below / 12 at)
+    if deny_n >= 12:
         alerts.append({
             "severity": "medium",
             "rule": "DENY_SPIKE",
@@ -27,7 +28,7 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
         })
 
     hb = sum(1 for e in events[-100:] if "confirm" in str(e.get("kind")).lower() or e.get("code") == "CONFIRM_REQUIRED")
-    if hb >= 5:
+    if hb >= 4:
         alerts.append({
             "severity": "high",
             "rule": "HIGH_BLAST_CHURN",
@@ -50,7 +51,7 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
         for e in events[-100:]
         if any(x in str(e.get("detail")).lower() + str(e.get("action")).lower() for x in ("quit", "x.post", "shell_exec"))
     )
-    if risky >= 3:
+    if risky >= 2:
         alerts.append({
             "severity": "medium",
             "rule": "RISKY_ACTION_SHAPE",
