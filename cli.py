@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 from collect import collect  # noqa: E402
 from detect import detect  # noqa: E402
+from lockdown import lockdown_clear, lockdown_engage, lockdown_status  # noqa: E402
 from respond import clear_freeze, list_incidents, respond  # noqa: E402
 from watch import watch_loop, watch_once  # noqa: E402
 
@@ -42,6 +43,26 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("incidents")
     sub.add_parser("clear-freeze", help="remove FREEZE files (operator recovery)")
     sub.add_parser("claim", help="print claim ceiling")
+    # Phase C — abhorrent lockdown
+    ld = sub.add_parser("lockdown", help="abhorrent mediated-plane lockdown status/engage/clear")
+    ld.add_argument(
+        "action",
+        nargs="?",
+        default="status",
+        choices=["status", "engage", "clear"],
+        help="status (default) | engage | clear",
+    )
+    ld.add_argument("--reason", default="abhorrent lockdown")
+    ld.add_argument(
+        "--disarm",
+        action="store_true",
+        help="also disarm leashes (default freeze-only)",
+    )
+    ld.add_argument(
+        "--force",
+        action="store_true",
+        help="engage even if detectors do not recommend",
+    )
 
     args = p.parse_args(argv)
 
@@ -56,6 +77,7 @@ def main(argv: list[str] | None = None) -> int:
                         "network SOC",
                         "stop-all-attacks guarantee",
                     ],
+                    "phase_c": "abhorrent lockdown on mediated MCP/agent tool shapes (FREEZE ± disarm)",
                     "pairs_with": ["mcp-assure", "browser-leash", "desktop-leash", "agent-control CUA"],
                 },
                 indent=2,
@@ -130,6 +152,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "clear-freeze":
         print(json.dumps({"ok": True, "cleared": clear_freeze()}, indent=2))
         return 0
+
+    if args.cmd == "lockdown":
+        if args.action == "status":
+            print(json.dumps(lockdown_status(), indent=2, default=str)[:20000])
+            return 0
+        if args.action == "engage":
+            out = lockdown_engage(
+                reason=args.reason,
+                disarm=bool(args.disarm),
+                force=bool(args.force),
+            )
+            print(json.dumps(out, indent=2, default=str)[:20000])
+            return 0 if out.get("ok") else 1
+        if args.action == "clear":
+            print(json.dumps(lockdown_clear(reason=args.reason), indent=2)[:8000])
+            return 0
 
     return 2
 

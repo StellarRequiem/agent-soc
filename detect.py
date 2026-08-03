@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+from abhorrent import abhorrent_alerts, lockdown_recommendation
+
 
 def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
     alerts: list[dict[str, Any]] = []
@@ -56,6 +58,9 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
             "recommendation": "human gate only; consider respond --freeze",
         })
 
+    # Phase C — abhorrent MCP / agentic-abuse shapes
+    alerts.extend(abhorrent_alerts(events))
+
     if not alerts:
         alerts.append({
             "severity": "info",
@@ -66,12 +71,14 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
 
     sev_rank = {"info": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
     max_sev = max(alerts, key=lambda a: sev_rank.get(a["severity"], 0))["severity"]
+    lock = lockdown_recommendation(alerts)
 
     return {
         "ok": True,
         "severity": max_sev,
         "alert_count": len([a for a in alerts if a["severity"] != "info"]),
         "alerts": alerts,
+        "lockdown": lock,
         "stats": {
             "events": len(events),
             "kinds_top": kinds.most_common(8),
