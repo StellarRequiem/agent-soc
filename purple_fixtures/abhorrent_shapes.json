@@ -43,7 +43,7 @@
       "id": "path_smell",
       "expect_rules": ["ABHORRENT_PATH_SMELL"],
       "expect_min_severity": "high",
-      "events": [{"detail": "open ../../../etc/passwd", "tool": "shell.read_file"}]
+      "events": [{"detail": "open ../../../etc/shadow", "tool": "shell.read_file"}]
     },
     {
       "id": "quiet_floor",

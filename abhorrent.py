@@ -12,8 +12,10 @@ import re
 from typing import Any
 
 # High-confidence secret / credential shapes in tool args or details
+# Do not treat /etc/passwd path alone as a credential secret (path detector owns that).
 _SECRET_RE = re.compile(
-    r"(?i)(api[_-]?key|password|passwd|private[_-]?key|secret[_-]?key|bearer\s+[a-z0-9._-]{20,}|"
+    r"(?i)(api[_-]?key|(?<![/])password(?!_)|(?<![/])passwd(?![a-z])|private[_-]?key|secret[_-]?key|"
+    r"bearer\s+[a-z0-9._\-]{20,}|"
     r"authorization:\s*bearer|aws_secret|-----BEGIN (RSA |EC )?PRIVATE KEY-----)"
 )
 
