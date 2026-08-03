@@ -21,3 +21,15 @@ dist/
 .DS_Store
 receipts/cua-session.json
 !.gitkeep
+
+# launchd / watch runtime
+incidents/watch.launchd*.log
+incidents/*.json
+!incidents/.gitkeep
+
+# runtime (never commit)
+incidents/watch.launchd*.log
+incidents/watch.jsonl
+incidents/inc-*.json
+incidents/index.jsonl
+incidents/lockdown-clear.jsonl
