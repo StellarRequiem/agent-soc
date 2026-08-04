@@ -3,10 +3,16 @@
 
 Does NOT publish accuracy % as a product claim. Reports raw counts for a fixed
 synthetic corpus so third parties can re-run the same table.
+
+Optional deterministic split (see corpora/HOLDOUT_DESIGN.md):
+  python3 hit_table.py --split holdout
+Holdout on N=50 is diagnostic only — not claim ladder R3.
 """
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -17,11 +23,48 @@ sys.path.insert(0, str(ROOT))
 from detect import detect  # noqa: E402
 
 CORPUS = ROOT / "corpora" / "labeled_traces_v0.json"
+DEFAULT_SEED = "stellar-holdout-v0"
 
 
-def main() -> int:
-    data = json.loads(CORPUS.read_text(encoding="utf-8"))
-    traces = data.get("traces") or []
+def _bucket(tid: str, seed: str) -> int:
+    h = hashlib.sha256(f"{seed}:{tid}".encode("utf-8")).hexdigest()
+    return int(h[:8], 16) % 100
+
+
+def _select(traces: list, split: str, seed: str) -> list:
+    if split == "all":
+        return list(traces)
+    out = []
+    for t in traces:
+        b = _bucket(str(t.get("id") or ""), seed)
+        # 80/20 train/holdout
+        in_holdout = b >= 80
+        if split == "holdout" and in_holdout:
+            out.append(t)
+        elif split == "train" and not in_holdout:
+            out.append(t)
+    return out
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Abhorrent detector hit table (synthetic)")
+    ap.add_argument(
+        "--split",
+        choices=("all", "train", "holdout"),
+        default="all",
+        help="deterministic corpus split (default all)",
+    )
+    ap.add_argument("--seed", default=DEFAULT_SEED, help="split seed")
+    ap.add_argument(
+        "--corpus",
+        default=str(CORPUS),
+        help="path to labeled traces JSON",
+    )
+    args = ap.parse_args(argv)
+
+    corpus_path = Path(args.corpus)
+    data = json.loads(corpus_path.read_text(encoding="utf-8"))
+    traces = _select(data.get("traces") or [], args.split, args.seed)
     rows = []
     hits = misses = fps = tns = 0
 
@@ -44,7 +87,6 @@ def main() -> int:
                 misses += 1
                 status = "MISS"
         else:
-            # benign: any abhorrent rule is FP
             if rules:
                 fps += 1
                 status = "FP"
@@ -66,7 +108,10 @@ def main() -> int:
     n_ben = sum(1 for t in traces if t.get("label") == "benign")
     report = {
         "ok": misses == 0 and fps == 0,
-        "corpus": str(CORPUS.name),
+        "corpus": corpus_path.name,
+        "split": args.split,
+        "seed": args.seed,
+        "n_traces": len(traces),
         "n_abhorrent": n_abh,
         "n_benign": n_ben,
         "hits": hits,
@@ -74,17 +119,17 @@ def main() -> int:
         "false_positives": fps,
         "true_negatives": tns,
         "note": (
-            "Synthetic fixed corpus — not a holdout study, not a published detection rate. "
-            "Re-run: python3 hit_table.py"
+            "Synthetic corpus — not a published detection rate. "
+            "Holdout split is diagnostic until N≥100 + study freeze. "
+            "See corpora/HOLDOUT_DESIGN.md. Re-run: python3 hit_table.py"
         ),
         "rows": rows,
     }
     print(json.dumps(report, indent=2)[:50000])
     outp = ROOT / "corpora" / "hit_table_latest.json"
     outp.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    # human summary line
     print(
-        f"\nhit_table hits={hits}/{n_abh} misses={misses} "
+        f"\nhit_table split={args.split} hits={hits}/{n_abh} misses={misses} "
         f"fp={fps}/{n_ben} tn={tns} ok={report['ok']}",
         file=sys.stderr,
     )
