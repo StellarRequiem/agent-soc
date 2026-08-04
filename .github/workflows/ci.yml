@@ -23,6 +23,10 @@ jobs:
           pip install pytest
       - name: Detector + response proof (offline, temp paths only)
         run: pytest tests/ -q
+      - name: Purple abhorrent fixtures
+        run: python purple.py
+      - name: Labeled corpus hit table (25/25 synthetic)
+        run: python hit_table.py
       - name: CLI claim + detect smoke
         run: |
           python cli.py claim

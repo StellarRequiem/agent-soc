@@ -21,7 +21,14 @@ _SECRET_RE = re.compile(
 
 # Path / template / packer smells (align with mcp-assure campaign smells)
 _PATH_SMELL_RE = re.compile(
-    r"(?i)(\.\./\.\./|/etc/passwd|/etc/shadow|~/.ssh/|%USERPROFILE%|\\\\windows\\\\system32)"
+    r"(?i)("
+    r"\.\./\.\./|"
+    r"\.\.\\.*\.\.\\|"  # windows-style parent hops
+    r"/etc/passwd|/etc/shadow|"
+    r"~/.ssh/|"
+    r"%USERPROFILE%|"
+    r"[/\\]windows[/\\]system32"
+    r")"
 )
 _TEMPLATE_SMELL_RE = re.compile(
     r"(?i)(\{\{.*\}\}|\$\{jndi:|<%.*%>|__import__\s*\(|eval\s*\(|os\.system\s*\()"
