@@ -8,10 +8,11 @@ receipts sources
   ~/mcp-assure/**/receipts (optional)
         │
         ▼
-   collect → normalize events
+   collect → normalize events (including host-stamped actor)
         │
         ▼
    detect → Alert[]
+     (UNKNOWN_TOOL catalog-spray counts skip passports.json actors)
         │
         ▼
    respond → FREEZE + disarm leashes + incidents/*.json

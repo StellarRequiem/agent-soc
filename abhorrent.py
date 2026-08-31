@@ -4,12 +4,18 @@ These rules target *shape* of tool abuse on control-plane receipts — not
 content moderation of free speech, not enterprise SIEM, not "stops all AI evil."
 
 Lockdown levers: FREEZE files (mcp-assure / agent-control) + optional leash DISARM.
+
+Catalog-spray rules (`ABHORRENT_TOOL_SPRAY`) skip host-stamped passport actors
+(see passports.json). Secret / path / shell-bypass / template / high-blast
+rules do not.
 """
 
 from __future__ import annotations
 
 import re
 from typing import Any
+
+from passports import actor_has_passport, load_passport_actors
 
 # High-confidence secret / credential shapes in tool args or details
 # Do not treat /etc/passwd path alone as a credential secret (path detector owns that).
@@ -139,10 +145,17 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
 
     # --- mass unknown tool catalog probing (stricter than UNKNOWN_TOOL_ATTEMPTS=3) ---
+    # Threshold is ≥5 unlabeled / non-passport UNKNOWN_TOOL in last 200 (code).
+    # Historical Phase C used ≥8; test name test_tool_spray_at_8 is leftover.
+    # Passport actors (passports.json) are excluded from this count only.
+    roster = load_passport_actors()
     unk = sum(
         1
         for e in window[-200:]
-        if e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN_TOOL" in str(e.get("code") or "")
+        if (
+            e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN_TOOL" in str(e.get("code") or "")
+        )
+        and not actor_has_passport(e, roster)
     )
     if unk >= 5:
         alerts.append(

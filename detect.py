@@ -6,6 +6,7 @@ from collections import Counter
 from typing import Any
 
 from abhorrent import abhorrent_alerts, lockdown_recommendation
+from passports import actor_has_passport, load_passport_actors
 
 
 def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -36,7 +37,13 @@ def detect(events: list[dict[str, Any]]) -> dict[str, Any]:
             "recommendation": "require explicit operator OK; close D4 session when idle",
         })
 
-    unk = sum(1 for e in events[-200:] if e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN" in str(e.get("code")))
+    roster = load_passport_actors()
+    unk = sum(
+        1
+        for e in events[-200:]
+        if (e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN" in str(e.get("code")))
+        and not actor_has_passport(e, roster)
+    )
     if unk >= 3:
         alerts.append({
             "severity": "high",
