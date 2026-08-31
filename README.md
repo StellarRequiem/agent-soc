@@ -34,7 +34,11 @@ python3 ~/agent-soc/cli.py incidents
 
 ## Architecture
 
-See `ARCHITECTURE.md` · Plan `~/ops/CUA_AND_AGENT_SOC_PLAN.md`
+See `ARCHITECTURE.md` · `ABHORRENT_LOCKDOWN.md` (passport + honest spray threshold ≥5)
+
+## Internal-agent passport
+
+`passports.json` is an operator-editable roster (default: grok, claude, codex). It grants **no catalog-spray freeze** for UNKNOWN_TOOL listings from those host-stamped actors. It does **not** grant a pass on deny-by-default, secrets, path/exec smells, or high-blast. Not a full SOC.
 
 
 ## License

@@ -80,13 +80,41 @@ def test_high_blast_churn_quiet_at_4():
     assert "HIGH_BLAST_CHURN" not in {a["rule"] for a in out["alerts"]}
 
 
-# ---- UNKNOWN_TOOL_ATTEMPTS (high, >= 3 in last 200) -----------------------
+# ---- UNKNOWN_TOOL_ATTEMPTS (high, >= 3 unlabeled / non-passport in last 200)
 
 def test_unknown_tool_fires_at_3():
     out = detect(_events("UNKNOWN_TOOL", n=3))
     rules = {a["rule"] for a in out["alerts"]}
     assert "UNKNOWN_TOOL_ATTEMPTS" in rules
     assert out["severity"] == "high"
+
+
+def test_unknown_tool_attempts_passport_grok_exempt():
+    ev = [
+        {
+            "plane": "agent-control",
+            "code": "UNKNOWN_TOOL",
+            "kind": "event",
+            "actor": "grok",
+            "detail": f"browser.press {i}",
+        }
+        for i in range(8)
+    ]
+    out = detect(ev)
+    rules = {a["rule"] for a in out["alerts"]}
+    assert "UNKNOWN_TOOL_ATTEMPTS" not in rules
+    assert "ABHORRENT_TOOL_SPRAY" not in rules
+    assert out["severity"] == "info"
+
+
+def test_unknown_tool_attempts_actor_agent_still_fires():
+    ev = [
+        {"plane": "agent-control", "code": "UNKNOWN_TOOL", "kind": "event", "actor": "agent"}
+        for _ in range(3)
+    ]
+    out = detect(ev)
+    rules = {a["rule"] for a in out["alerts"]}
+    assert "UNKNOWN_TOOL_ATTEMPTS" in rules
 
 
 # ---- RISKY_ACTION_SHAPE (medium, >= 2 quit/post/shell in last 100) --------
@@ -167,6 +195,18 @@ def test_watch_does_not_freeze_when_quiet(tmp_path, monkeypatch):
     out = watch_mod.watch_once(auto_respond_high=True, reason="proof")
     assert out["severity"] == "info"
     assert calls == []  # never responded
+
+
+def test_watch_does_not_freeze_passport_catalog_listing(tmp_path, monkeypatch):
+    # Live 2026-08-31 shape: grok MCP client listing pack tools is not a worm.
+    ev = [
+        {"code": "UNKNOWN_TOOL", "actor": "grok", "detail": f"browser.press {i}"}
+        for i in range(8)
+    ]
+    calls = _install_recording_watch(monkeypatch, tmp_path, ev)
+    out = watch_mod.watch_once(auto_respond_high=True, reason="proof")
+    assert "ABHORRENT_TOOL_SPRAY" not in {a["rule"] for a in out.get("alerts") or []}
+    assert calls == []
 
 
 def test_watch_ignores_high_when_flag_off(tmp_path, monkeypatch):

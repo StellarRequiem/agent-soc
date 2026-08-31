@@ -7,6 +7,7 @@
 | Collects local control-plane receipts | `collect.py` |
 | Detects simple abuse shapes (deny spikes, high-blast churn) | `detect.py` |
 | Detects abhorrent MCP shapes (secret/path/template/shell spray) | `abhorrent.py` + tests + `purple.py` |
+| Internal-agent passport: host-stamped roster actors skip catalog-spray rules only | `passports.json` · `passports.py` · tests — **not** a full SOC exemption |
 | Synthetic labeled corpus hit table (25/25) | `corpora/labeled_traces_v0.json` · `hit_table.py` — **not** a published accuracy % |
 | Responds with FREEZE + optional disarm + incidents | `respond.py` |
 | Lockdown status/engage/clear surface | `lockdown.py` · `cli.py lockdown` |

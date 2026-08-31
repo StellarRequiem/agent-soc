@@ -44,6 +44,7 @@ def collect(*, max_per_file: int = 2000) -> dict[str, Any]:
         for path in sorted(root.glob("*.jsonl")):
             files.append(str(path))
             for row in _iter_jsonl(path, max_lines=max_per_file):
+                actor_raw = row.get("actor")
                 events.append(
                     {
                         "plane": plane,
@@ -53,6 +54,8 @@ def collect(*, max_per_file: int = 2000) -> dict[str, Any]:
                         "code": row.get("code") or row.get("reason") or "",
                         "action": row.get("action") or "",
                         "detail": str(row.get("detail") or row.get("summary") or "")[:200],
+                        # Host-stamped actor only (plane_host.py), not request headers.
+                        "actor": "" if actor_raw is None else str(actor_raw).strip(),
                         "raw_keys": sorted(row.keys())[:12],
                     }
                 )

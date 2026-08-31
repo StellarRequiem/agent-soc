@@ -1,0 +1,6 @@
+{
+  "description": "Operator-editable internal-agent passport roster. Edit this file on disk. Matched against the host-stamped receipt actor field — not a request header anyone can set.",
+  "grants": "UNKNOWN_TOOL catalog-listing from these actors does not count toward UNKNOWN_TOOL_ATTEMPTS or ABHORRENT_TOOL_SPRAY (no catalog-spray freeze from MCP client pack listing).",
+  "does_not_grant": "Deny-by-default remains. No exemption from ABHORRENT_SECRET_SHAPE, ABHORRENT_SHELL_BYPASS, ABHORRENT_PATH_SMELL, ABHORRENT_TEMPLATE_SMELL, or ABHORRENT_HIGHBLAST_SPRAY. Missing/empty actor and actor=agent (or anything not on this roster) keep current unlabeled thresholds.",
+  "actors": ["grok", "claude", "codex"]
+}
