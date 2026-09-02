@@ -112,6 +112,12 @@ def test_respond_writes_freeze_and_incident(tmp_path, monkeypatch):
     freeze_b = tmp_path / "b" / "FREEZE"
     monkeypatch.setattr(respond_mod, "FREEZE_PATHS", [freeze_a, freeze_b])
     monkeypatch.setattr(respond_mod, "INCIDENTS", tmp_path / "incidents")
+    # The automatic freeze is now disarmed until an operator arms it, so this test
+    # arms it explicitly. It is asserting that respond() writes the files when it is
+    # supposed to — which is now conditional on that act, not automatic.
+    arm = tmp_path / "FREEZE_ARMED"
+    arm.write_text("armed\n", encoding="utf-8")
+    monkeypatch.setattr(respond_mod, "FREEZE_ARM", arm)
 
     out = respond_mod.respond(reason="unit-proof spike", freeze=True, disarm=False, alerts=[{"rule": "UNKNOWN_TOOL_ATTEMPTS", "severity": "high"}])
 
