@@ -17,11 +17,12 @@ import respond as R
 
 @pytest.fixture
 def arm(tmp_path, monkeypatch):
-    """Point both the arm file and the freeze markers at scratch space."""
+    """Point every mutable response surface at scratch space."""
     arm_file = tmp_path / "FREEZE_ARMED"
     markers = (tmp_path / "a" / "FREEZE", tmp_path / "b" / "FREEZE")
     monkeypatch.setattr(R, "FREEZE_ARM", arm_file)
     monkeypatch.setattr(R, "FREEZE_PATHS", markers)
+    monkeypatch.setattr(R, "INCIDENTS", tmp_path / "incidents")
     return arm_file, markers
 
 

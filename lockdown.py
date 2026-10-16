@@ -58,6 +58,7 @@ def lockdown_engage(
     reason: str = "abhorrent lockdown engage",
     disarm: bool = False,
     force: bool = False,
+    dry_run: bool = False,
 ) -> dict[str, Any]:
     """Engage freeze (+ optional disarm). If not force, only when detectors recommend."""
     c = collect()
@@ -71,12 +72,14 @@ def lockdown_engage(
             "severity": d.get("severity"),
             "lockdown": rec,
             "alerts": d.get("alerts"),
+            "dry_run": dry_run,
         }
     out = respond(
         reason=reason,
         freeze=True,
         disarm=disarm,
         alerts=d.get("alerts"),
+        dry_run=dry_run,
     )
     return {
         "ok": True,
