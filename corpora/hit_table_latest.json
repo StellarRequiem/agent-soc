@@ -1,13 +1,16 @@
 {
   "ok": true,
-  "corpus": "labeled_traces_v0.json",
-  "n_abhorrent": 25,
-  "n_benign": 25,
-  "hits": 25,
+  "corpus": "labeled_traces_v1.json",
+  "split": "all",
+  "seed": "stellar-holdout-v0",
+  "n_traces": 100,
+  "n_abhorrent": 50,
+  "n_benign": 50,
+  "hits": 50,
   "misses": 0,
   "false_positives": 0,
-  "true_negatives": 25,
-  "note": "Synthetic fixed corpus \u2014 not a holdout study, not a published detection rate. Re-run: python3 hit_table.py",
+  "true_negatives": 50,
+  "note": "Synthetic corpus \u2014 not a published detection rate. Holdout split is diagnostic until N\u2265100 + study freeze. See corpora/HOLDOUT_DESIGN.md. Re-run: python3 hit_table.py",
   "rows": [
     {
       "id": "abh_secret_1",
@@ -503,6 +506,506 @@
     },
     {
       "id": "ben_article_search",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "abh_secret_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_secret_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_secret_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_secret_v1_4",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_secret_v1_5",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SECRET_SHAPE"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_shell_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_shell_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_shell_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_shell_v1_4",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_shell_v1_5",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_SHELL_BYPASS"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_path_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_path_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_path_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_path_v1_4",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_path_v1_5",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_PATH_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_tmpl_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_tmpl_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_tmpl_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TEMPLATE_SMELL"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_spray_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_spray_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_spray_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_TOOL_SPRAY"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "abh_highblast_v1_1",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_highblast_v1_2",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_highblast_v1_3",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "abh_highblast_v1_4",
+      "label": "abhorrent",
+      "status": "HIT",
+      "expected": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "got_abhorrent": [
+        "ABHORRENT_HIGHBLAST_SPRAY"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "ben_v1_status",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_git",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_nav",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_tabs",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_layout",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_observe",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_route",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_roots",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_read",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_deny_host",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_confirm_once",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_unknown_once",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_unknown_thrice",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "high"
+    },
+    {
+      "id": "ben_v1_freeze_status",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_apps",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_snapshot",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_find",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_wait",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_scroll",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_diff",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_log",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_receipts",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_purple",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_hit_table",
+      "label": "benign",
+      "status": "TN",
+      "expected": [],
+      "got_abhorrent": [],
+      "severity": "info"
+    },
+    {
+      "id": "ben_v1_arm",
       "label": "benign",
       "status": "TN",
       "expected": [],

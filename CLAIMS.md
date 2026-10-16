@@ -11,6 +11,9 @@
 | Responds with FREEZE + optional disarm + incidents | `respond.py` |
 | Lockdown status/engage/clear surface | `lockdown.py` · `cli.py lockdown` |
 | Continuous watch; auto-FREEZE only on abhorrent class | `watch.py` |
+| AgenticDefender cycle (observe→decide→FREEZE; dry-run; optional disarm) | `agentic_defender.py`, `cli.py agentic` |
+| Respond/lockdown **dry-run** (no write) | `respond.py`, `cli.py --dry-run` |
+| Configurable receipt source roots | `collect.py` + env |
 
 ## Not allowed
 

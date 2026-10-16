@@ -11,6 +11,27 @@ from __future__ import annotations
 import re
 from typing import Any
 
+#: Planes whose UNKNOWN_TOOL events carry no catalog-probing signal.
+#:
+#: This rule looks for an agent enumerating a plane's tool catalog by calling names
+#: that do not exist. That inference only holds where a catalog exists to probe.
+#: `claude-control` logs Claude's OWN harness tools — ToolSearch, AskUserQuestion,
+#: ScheduleWakeup, every `mcp__Claude_Browser__*` — which are not plane tools, were
+#: never in the plane catalog, and never should be. Every one of them is recorded as
+#: UNKNOWN_TOOL by construction.
+#:
+#: Measured on the live receipt stream: 2,136 UNKNOWN_TOOL events, of which 2,082
+#: (97.5%) were claude-control. At a threshold of 5 in a 200-event window, any window
+#: that touched Claude working at all tripped a *critical* alert and froze the plane,
+#: continuously, every 30s — which is what it was doing when this was found. The
+#: signal was 2.5% of the volume and could never be seen.
+#:
+#: Exempting the source is deliberately narrower than raising the threshold or
+#: disabling the rule. The 54 genuine agent-control probes still count, and still fire
+#: at 5. A higher defensive posture that wants Claude's tool use policed should do it
+#: with a rule about Claude's catalog, not by feeding this one events it cannot read.
+SPRAY_EXEMPT_PLANES = frozenset({"claude-control"})
+
 # High-confidence secret / credential shapes in tool args or details
 # Do not treat /etc/passwd path alone as a credential secret (path detector owns that).
 _SECRET_RE = re.compile(
@@ -139,17 +160,22 @@ def abhorrent_alerts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
 
     # --- mass unknown tool catalog probing (stricter than UNKNOWN_TOOL_ATTEMPTS=3) ---
-    unk = sum(
-        1
+    unk_events = [
+        e
         for e in window[-200:]
-        if e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN_TOOL" in str(e.get("code") or "")
-    )
+        if (e.get("code") == "UNKNOWN_TOOL" or "UNKNOWN_TOOL" in str(e.get("code") or ""))
+        and e.get("plane") not in SPRAY_EXEMPT_PLANES
+    ]
+    unk = len(unk_events)
     if unk >= 5:
         alerts.append(
             {
                 "severity": "critical",
                 "rule": "ABHORRENT_TOOL_SPRAY",
-                "detail": f"{unk} unknown-tool probes (catalog spray)",
+                "detail": (
+                    f"{unk} unknown-tool probes (catalog spray) on "
+                    + ", ".join(sorted({str(e.get("plane")) for e in unk_events}))
+                ),
                 "recommendation": "lockdown engage; review agent tool proposal loop",
                 "class": "abhorrent",
             }
