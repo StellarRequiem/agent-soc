@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy to a private path and set AGENT_SOC_SOURCES_FILE. Paths must exist.",
+  "sources": {
+    "browser-leash": "~/browser-leash/receipts",
+    "desktop-leash": "~/desktop-leash/receipts",
+    "agent-control": "~/agent-control/receipts",
+    "claude-control": "~/claude-control/receipts"
+  }
+}
